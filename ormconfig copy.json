@@ -1,0 +1,14 @@
+{
+    "type": "mysql",
+    "host": "localhost",
+    "port": 3306,
+    "username": "root",
+    "password": "password",
+    "database": "myblog",
+    "charset": "utf8mb4",
+    "entities": ["dist/**/*.entity.js"],
+    "synchronize": true,
+    "maxQueryExecutionTime": 1000,
+    "logging": ["query", "error", "warn", "info", "log"],
+    "logger": "file"
+}
