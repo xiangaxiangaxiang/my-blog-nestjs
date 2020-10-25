@@ -13,6 +13,7 @@ import { UpdatePasswordDto } from './dto/update-password.dto';
 import { FileOperation } from 'src/utils/file-operation';
 import { AdminRegisterDto } from './dto/admin-register.dto';
 import { PaginationDto } from 'src/utils/pagination.dto';
+import { UserIdDto } from './dto/user-id.dto';
 
 @Injectable()
 export class UsersService {
@@ -35,7 +36,7 @@ export class UsersService {
         await this.usersRepository.save(newUser)
     }
 
-    getDefaultAvatar() {
+    _getDefaultAvatar() {
         return `/img/avatar/default_${ Math.floor(Math.random() * 5) + 1 }.jpg`
     }
 
@@ -45,10 +46,10 @@ export class UsersService {
             throw new HttpException({message: '用户已存在'}, HttpStatus.BAD_REQUEST)
         }
         const {adminSecret, ...data} = adminRegisterDto
-        const admin = Object.assign({}, data, {
-            avatar: this.getDefaultAvatar(),
+        const admin = Object.assign(data, {
+            avatar: this._getDefaultAvatar(),
             userType: UserType.ADMIN,
-            enable: UserStatus.enable
+            enable: UserStatus.ENABLE
         })
         await this.addUser(admin)
     }
@@ -58,19 +59,19 @@ export class UsersService {
         if (userExist) {
             throw new HttpException({message: '用户已存在'}, HttpStatus.BAD_REQUEST)
         }
-        const user = Object.assign({}, userRegisterDto, {
-            avatar: this.getDefaultAvatar(),
+        const user = Object.assign(userRegisterDto, {
+            avatar: this._getDefaultAvatar(),
             userType: UserType.USER,
-            enable: UserStatus.enable
+            enable: UserStatus.ENABLE
         })
         await this.addUser(user)
     }
 
-    validateUser(user:User, password?:string) {
+    _validateUser(user:User, password?:string) {
         if (!user) {
             throw new HttpException({message: '用户未注册'}, HttpStatus.NOT_FOUND)
         }
-        if (user.enable === UserStatus.disable) {
+        if (user.enable === UserStatus.DISABLE) {
             throw new HttpException({message:'用户已被禁用'}, HttpStatus.UNAUTHORIZED)
         }
         if (password) {
@@ -81,7 +82,7 @@ export class UsersService {
         }
     }
 
-    generateToken(user:User):string {
+    _generateToken(user:User):string {
         const payload = {
             uid: user.uid,
             userType: user.userType,
@@ -95,8 +96,8 @@ export class UsersService {
         if (user.userType !== UserType.ADMIN) {
             throw new HttpException({message: '无权登陆'}, HttpStatus.UNAUTHORIZED)
         }
-        this.validateUser(user, userLoginDto.password)
-        const token = this.generateToken(user)
+        this._validateUser(user, userLoginDto.password)
+        const token = this._generateToken(user)
         const {id, password, ...userData} = user
         return {
             user: userData,
@@ -106,8 +107,8 @@ export class UsersService {
 
     async userLogin(userLoginDto: UserLoginDto):Promise<UserLogin> {
         const user = await this.getUser({account: userLoginDto.account})
-        this.validateUser(user, userLoginDto.password)
-        const token = this.generateToken(user)
+        this._validateUser(user, userLoginDto.password)
+        const token = this._generateToken(user)
         const {id, password, ...userData} = user
         return {
             user: userData,
@@ -117,20 +118,20 @@ export class UsersService {
 
     async updatePassword(updatePasswordDto:UpdatePasswordDto) {
         const user = await this.getUser({uid: updatePasswordDto.uid})
-        this.validateUser(user, updatePasswordDto.oldPassword)
+        this._validateUser(user, updatePasswordDto.oldPassword)
         user.password = updatePasswordDto.newPassword
         await this.usersRepository.save(user)
     }
 
     async updateNickname(uid:string, nickname: string) {
         const user = await this.getUser({uid})
-        this.validateUser(user)
+        this._validateUser(user)
         this.usersRepository.update(user.id, {nickname})
     }
 
-    async updateAvatar(uid, avatar):Promise<string> {
+    async updateAvatar(uid: string, avatar:any):Promise<string> {
         const user = await this.getUser({uid})
-        this.validateUser(user)
+        this._validateUser(user)
         const suffix = avatar.name.split('.').pop()
         const avatarPath = `/img/avatar/avatar_${uid}.${suffix}`
         const filelist = [{
@@ -156,9 +157,26 @@ export class UsersService {
                 nickname: Like(`%${paginationDto.searchText}%`)
             }
         }
-        console.log(filter)
         const [users, total] = await this.usersRepository.findAndCount(filter)
         return {users, total}
+    }
+
+    async banUser(userIdDto:UserIdDto) {
+        const user = await this.getUser({uid: userIdDto.uid})
+        if (!user) {
+            throw new HttpException({message:'用户不存在'}, HttpStatus.BAD_REQUEST)
+        }
+        user.enable = UserStatus.DISABLE
+        this.usersRepository.save(user)
+    }
+
+    async unblockUser(userIdDto:UserIdDto) {
+        const user = await this.getUser({uid: userIdDto.uid})
+        if (!user) {
+            throw new HttpException({message:'用户不存在'}, HttpStatus.BAD_REQUEST)
+        }
+        user.enable = UserStatus.ENABLE
+        this.usersRepository.save(user)
     }
 
 }

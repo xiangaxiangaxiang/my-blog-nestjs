@@ -1,4 +1,4 @@
-import { BeforeInsert, BeforeUpdate, Column, Entity, Generated, PrimaryGeneratedColumn } from "typeorm";
+import { BeforeInsert, BeforeUpdate, Column, CreateDateColumn, DeleteDateColumn, Entity, Generated, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 import * as bcrypt from 'bcryptjs'
 import { UserStatus, UserType } from './type'
 
@@ -35,5 +35,14 @@ export class User {
 
     @Column({type: 'enum', enum: UserStatus})
     enable: number
+
+    @CreateDateColumn()
+    createdTime: Date
+
+    @UpdateDateColumn()
+    updatedTime: Date
+
+    @DeleteDateColumn()
+    deletedTime: Date
 
 }

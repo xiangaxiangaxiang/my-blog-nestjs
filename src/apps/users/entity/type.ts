@@ -5,6 +5,6 @@ export enum UserType {
 }
 
 export enum UserStatus {
-    disable=0,
-    enable=1
+    DISABLE=0,
+    ENABLE=1
 }

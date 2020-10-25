@@ -1,4 +1,4 @@
-import { IsEnum, IsInt, IsOptional, Max, MaxLength } from 'class-validator'
+import { IsEnum, IsNumberString, IsOptional, Max, MaxLength } from 'class-validator'
 
 enum OrderName {
     ASC="ASC",
@@ -7,11 +7,10 @@ enum OrderName {
 
 export class PaginationDto {
 
-    @IsInt()
+    @IsNumberString()
     readonly offset: number
 
-    @IsInt()
-    @Max(20)
+    @IsNumberString()
     readonly limit: number
 
     @IsOptional()
@@ -23,6 +22,6 @@ export class PaginationDto {
 
     @IsOptional()
     @IsEnum(OrderName)
-    readonly orderName: string = 'DESC'
+    readonly orderName: OrderName = OrderName.ASC
 
 }

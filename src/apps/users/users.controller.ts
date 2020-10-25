@@ -1,10 +1,11 @@
-import { Body, Controller, Get, HttpException, HttpStatus, Param, Post, Request, Response, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Get, HttpException, HttpStatus, Param, ParseIntPipe, Post, Query, Request, Response, UploadedFile, UseGuards, UseInterceptors, UsePipes } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express/multer/interceptors/file.interceptor';
 import { JwtAuthGuard } from 'src/guard/Jwt-auth-guard.guard';
 import { PaginationDto } from 'src/utils/pagination.dto';
 import { AdminRegisterDto } from './dto/admin-register.dto';
 import { UpdateNicknameDto } from './dto/update-nickname.dto';
 import { UpdatePasswordDto } from './dto/update-password.dto';
+import { UserIdDto } from './dto/user-id.dto';
 import { UserLoginDto } from './dto/user-login.dto';
 import { UserRegisterDto } from './dto/user-register.dto';
 import { UserType } from './entity/type';
@@ -75,7 +76,6 @@ export class UsersController {
     @Post('update_avatar')
     @UseInterceptors(FileInterceptor('file'))
     async updateAvatar(@Request() req, @UploadedFile() avatar) {
-        console.log(avatar)
         if (!avatar) {
             throw new HttpException({message: '请上传一个图片文件'}, HttpStatus.BAD_REQUEST)
         }
@@ -92,10 +92,25 @@ export class UsersController {
         throw new HttpException(res, HttpStatus.OK)
     }
 
+    // @UseGuards(new JwtAuthGuard(UserType.ADMIN))
     @Get('list')
-    async getUserList(@Param() paginationDto:PaginationDto) {
-        const users = await this.usersService.getUserList(paginationDto)
-        throw new HttpException({data: { users }}, HttpStatus.OK)
+    async getUserList(@Query() paginationDto:PaginationDto) {
+        const {users, total} = await this.usersService.getUserList(paginationDto)
+        throw new HttpException({data: { users, total }}, HttpStatus.OK)
+    }
+
+    @UseGuards(new JwtAuthGuard(UserType.ADMIN))
+    @Post('disable')
+    async banUser(@Body() userIdDto:UserIdDto) {
+        await this.usersService.banUser(userIdDto)
+        throw new HttpException({message: '已禁用该用户'}, HttpStatus.OK)
+    }
+
+    @UseGuards(new JwtAuthGuard(UserType.ADMIN))
+    @Post('enable')
+    async unblockUser(@Body() userIdDto:UserIdDto) {
+        await this.usersService.unblockUser(userIdDto)
+        throw new HttpException({message: '用户已被解除禁用'}, HttpStatus.OK)
     }
 
 }
