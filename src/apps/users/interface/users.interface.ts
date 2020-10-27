@@ -1,4 +1,4 @@
-import { UserStatus, UserType } from "../entity/type";
+import { UserStatus, UserType } from "../entity/enum";
 
 export interface UserLogin {
     user: {

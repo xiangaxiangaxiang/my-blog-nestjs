@@ -1,6 +1,6 @@
 import { Body, Controller, HttpException, HttpStatus, Post, UseGuards } from '@nestjs/common';
 import { JwtAuthGuard } from 'src/guard/Jwt-auth-guard.guard';
-import { UserType } from '../users/entity/type';
+import { UserType } from '../users/entity/enum';
 import { ArticlesService } from './articles.service';
 import { UpsertArticleDto } from './dto/article-upsert.dto';
 

@@ -8,7 +8,7 @@ import { UpdatePasswordDto } from './dto/update-password.dto';
 import { UserIdDto } from './dto/user-id.dto';
 import { UserLoginDto } from './dto/user-login.dto';
 import { UserRegisterDto } from './dto/user-register.dto';
-import { UserType } from './entity/type';
+import { UserType } from './entity/enum';
 import { UsersService } from './users.service';
 
 @Controller('users')

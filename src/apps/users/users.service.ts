@@ -6,7 +6,7 @@ import * as bcrypt from 'bcryptjs'
 
 import { UserLoginDto } from './dto/user-login.dto';
 import { UserRegisterDto } from './dto/user-register.dto';
-import { UserStatus, UserType } from './entity/type';
+import { UserStatus, UserType } from './entity/enum';
 import { User } from './entity/users.entity';
 import { UserLogin } from './interface/users.interface';
 import { UpdatePasswordDto } from './dto/update-password.dto';

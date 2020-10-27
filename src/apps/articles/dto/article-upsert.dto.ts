@@ -1,5 +1,5 @@
 import { IsEnum, IsOptional, IsString, Length } from "class-validator";
-import { ArticleType, ReleaseStatus } from "../entity/type";
+import { ArticleType, ReleaseStatus } from "../entity/enum";
 
 export class UpsertArticleDto {
 

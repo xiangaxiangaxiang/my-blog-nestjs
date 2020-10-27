@@ -1,6 +1,5 @@
-import { CacheKey } from "@nestjs/common";
 import { Column, CreateDateColumn, DeleteDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
-import { ArticleType, ReleaseStatus } from "./type";
+import { ArticleType, ReleaseStatus } from "./enum";
 
 @Entity()
 export class Article {

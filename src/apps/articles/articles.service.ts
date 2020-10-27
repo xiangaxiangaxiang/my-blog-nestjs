@@ -4,7 +4,7 @@ import { myXss } from 'src/utils/xss';
 import { Repository } from 'typeorm';
 import { UpsertArticleDto } from './dto/article-upsert.dto';
 import { Article } from './entity/articles.entity';
-import { ArticleType } from './entity/type';
+import { ArticleType } from './entity/enum';
 
 @Injectable()
 export class ArticlesService {
