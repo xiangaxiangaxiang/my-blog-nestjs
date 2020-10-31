@@ -64,5 +64,30 @@ export class ArticlesController {
         throw new HttpException({message: '文章发表成功'}, HttpStatus.OK)
     }
 
+    @UseGuards(new JwtAuthGuard(UserType.ADMIN))
+    @Post('take_off')
+    async takeTheArticleOff(@Body() {articleId}:ArticleId) {
+        await this.artcilesService.takeTheArticleOff(articleId)
+        throw new HttpException({message: '文章已下架'}, HttpStatus.OK)
+    }
+
+    @UseGuards(new JwtAuthGuard(UserType.ADMIN))
+    @Post('delete')
+    async deleteArticle(@Body() {articleId}:ArticleId) {
+        await this.artcilesService.deleteArticle(articleId)
+        throw new HttpException({message: '文章已删除'}, HttpStatus.OK)
+    }
+
+    @Get('about')
+    async getAbout() {
+        const data = await this.artcilesService.getAbout()
+        throw new HttpException({data}, HttpStatus.OK)
+    }
+
+    @Get('about')
+    async getLabel() {
+        const data = await this.artcilesService.getLabel()
+        throw new HttpException({data}, HttpStatus.OK)
+    }
 
 }

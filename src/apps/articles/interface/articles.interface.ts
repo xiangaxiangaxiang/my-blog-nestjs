@@ -8,3 +8,7 @@ export interface GetArticleList {
 export interface SaveImage {
     urlList: [number, string][]
 }
+
+export interface GetArticleDetail {
+    article: Article
+}

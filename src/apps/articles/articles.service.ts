@@ -3,19 +3,20 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { FileOperation } from 'src/utils/file-operation';
 import { myXss } from 'src/utils/xss';
 import { FindManyOptions, Like, Repository } from 'typeorm';
-import { ArticleId } from './dto/article-id.dto';
 import { UpsertArticleDto } from './dto/article-upsert.dto';
 import { GetArticlesAdmin } from './dto/get-articles-admin.dto';
 import { Article } from './entity/articles.entity';
 import { ArticleType, ReleaseStatus } from './entity/enum';
-import { GetArticleList, SaveImage } from './interface/articles.interface';
+import { Labels } from './entity/labels.entity';
+import { GetArticleDetail, GetArticleList, SaveImage } from './interface/articles.interface';
 
 @Injectable()
 export class ArticlesService {
     fileOperation: FileOperation;
 
     constructor(
-        @InjectRepository(Article) private readonly articleRepository: Repository<Article>
+        @InjectRepository(Article) private readonly articleRepository: Repository<Article>,
+        @InjectRepository(Labels) private readonly labelRepository: Repository<Labels>
     ) {
         this.fileOperation = new FileOperation()
     }
@@ -33,6 +34,8 @@ export class ArticlesService {
             }, upsertArticleDto)
         }
     }
+
+    async getLabel() {}
 
     async showArticleList(getArticlesAdmin:GetArticlesAdmin): Promise<GetArticleList> {
         const filter: FindManyOptions = {
@@ -107,15 +110,40 @@ export class ArticlesService {
 
     async postArticle(articleId:string) {
         const article = await this._getArticle({articleId})
-        if (!article) {
-            throw new HttpException({message: '文章不存在'}, HttpStatus.BAD_REQUEST)
-        }
         article.releaseStatus = ReleaseStatus.RELEASE
         await this.articleRepository.save(article)
     }
 
-    async _getArticle(filter:{articleId:string}):Promise<Article> {
+    async takeTheArticleOff(articleId:string) {
+        const article = await this._getArticle({articleId})
+        article.releaseStatus = ReleaseStatus.NOT_RELEASE
+        await this.articleRepository.save(article)
+    }
+
+    async deleteArticle(articleId:string) {
+        const article = await this._getArticle({articleId})
+        await this.articleRepository.remove(article)
+    }
+
+    async getAbout():Promise<GetArticleDetail> {
+        const article = await this.articleRepository.findOne({
+            where: {
+                articleType: ArticleType.ABOUT,
+                releaseStatus: ReleaseStatus.RELEASE
+            },
+            order: {
+                updatedTime: 'DESC'
+            },
+            select: ['html', 'updatedTime', 'title']
+        })
+        return {article}
+    }
+
+    async _getArticle(filter:{articleId:string}, message='文章不存在'):Promise<Article> {
         const article = await this.articleRepository.createQueryBuilder('user').select().where(filter).getOne()
+        if (!article) {
+            throw new HttpException({message}, HttpStatus.BAD_REQUEST)
+        }
         return article
     }
 
