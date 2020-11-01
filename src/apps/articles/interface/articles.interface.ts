@@ -1,7 +1,8 @@
 import { Article } from "../entity/articles.entity";
+import { Labels } from "../entity/labels.entity";
 
 export interface GetArticleList {
-    total:number
+    total?:number
     articles: Article[]
 }
 
@@ -11,4 +12,8 @@ export interface SaveImage {
 
 export interface GetArticleDetail {
     article: Article
+}
+
+export interface GetLabels {
+    labels: Labels[]
 }

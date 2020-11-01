@@ -1,18 +1,22 @@
-import { Body, Controller, Get, HttpException, HttpStatus, Post, Query, UploadedFiles, UseGuards, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Get, HttpException, HttpStatus, Post, Query, UploadedFiles, UseGuards, UseInterceptors, Request } from '@nestjs/common';
 import { FilesInterceptor } from '@nestjs/platform-express/multer/interceptors/files.interceptor';
 import { JwtAuthGuard } from 'src/guard/Jwt-auth-guard.guard';
+import { LikesService } from '../likes/likes.service';
 import { UserType } from '../users/entity/enum';
 import { ArticlesService } from './articles.service';
-import { ArticleId } from './dto/article-id.dto';
+import { ArticleIdDto } from './dto/article-id.dto';
 import { UpsertArticleDto } from './dto/article-upsert.dto';
-import { GetArticlesAdmin } from './dto/get-articles-admin.dto';
+import { GetArticlesAdminDto } from './dto/get-articles-admin.dto';
+import { GetLabelsDto } from './dto/get-labels.dto';
+import { GetRecommendationDto } from './dto/get-recommendation.dto';
 import { SaveImage } from './interface/articles.interface';
 
 @Controller('articles')
 export class ArticlesController {
 
     constructor(
-        private readonly artcilesService:ArticlesService
+        private readonly artcilesService:ArticlesService,
+        private readonly likesService:LikesService
     ) {}
 
     @UseGuards(new JwtAuthGuard(UserType.ADMIN))
@@ -32,8 +36,8 @@ export class ArticlesController {
 
     @UseGuards(new JwtAuthGuard(UserType.ADMIN))
     @Get('list')
-    async getArticleListByAdmin(@Query() getArticlesAdmin:GetArticlesAdmin) {
-        const data = await this.artcilesService.getArticlesByAdmin(getArticlesAdmin)
+    async getArticleListByAdmin(@Query() getArticlesAdminDto:GetArticlesAdminDto) {
+        const data = await this.artcilesService.getArticlesByAdmin(getArticlesAdminDto)
         const res = {
             data
         }
@@ -41,8 +45,8 @@ export class ArticlesController {
     }
 
     @Get('/')
-    async getArticleList(@Query() getArticlesAdmin:GetArticlesAdmin) {
-        const data = await this.artcilesService.showArticleList(getArticlesAdmin)
+    async getArticleList(@Query() getArticlesAdminDto:GetArticlesAdminDto) {
+        const data = await this.artcilesService.showArticleList(getArticlesAdminDto)
         const res = {
             data
         }
@@ -59,21 +63,21 @@ export class ArticlesController {
 
     @UseGuards(new JwtAuthGuard(UserType.ADMIN))
     @Post('post_ariticle')
-    async postArticle(@Body() {articleId}:ArticleId) {
+    async postArticle(@Body() {articleId}:ArticleIdDto) {
         await this.artcilesService.postArticle(articleId)
         throw new HttpException({message: '文章发表成功'}, HttpStatus.OK)
     }
 
     @UseGuards(new JwtAuthGuard(UserType.ADMIN))
     @Post('take_off')
-    async takeTheArticleOff(@Body() {articleId}:ArticleId) {
+    async takeTheArticleOff(@Body() {articleId}:ArticleIdDto) {
         await this.artcilesService.takeTheArticleOff(articleId)
         throw new HttpException({message: '文章已下架'}, HttpStatus.OK)
     }
 
     @UseGuards(new JwtAuthGuard(UserType.ADMIN))
     @Post('delete')
-    async deleteArticle(@Body() {articleId}:ArticleId) {
+    async deleteArticle(@Body() {articleId}:ArticleIdDto) {
         await this.artcilesService.deleteArticle(articleId)
         throw new HttpException({message: '文章已删除'}, HttpStatus.OK)
     }
@@ -84,9 +88,27 @@ export class ArticlesController {
         throw new HttpException({data}, HttpStatus.OK)
     }
 
-    @Get('about')
-    async getLabel() {
-        const data = await this.artcilesService.getLabel()
+    @Get('labels')
+    async getLabel(@Query() getLabelsDto:GetLabelsDto) {
+        const data = await this.artcilesService.getLabel(getLabelsDto)
+        throw new HttpException({data}, HttpStatus.OK)
+    }
+
+    @Get('recommendation')
+    async getRecommendation(@Query() getRecommendationDto:GetRecommendationDto) {
+        const data = await this.artcilesService.getRecommendation(getRecommendationDto)
+        throw new HttpException({data}, HttpStatus.OK)
+    }
+
+    @UseGuards(new JwtAuthGuard(UserType.TOURIST))
+    @Get('detail')
+    async getArticleDetail(@Query() {articleId}:ArticleIdDto, @Request() req) {
+        const {article} = await this.artcilesService.getArticleDetail(articleId)
+        const likeStatus = await this.likesService.getLikeStatus(articleId, req.user.uid)
+        const data = {
+            article,
+            likeStatus
+        }
         throw new HttpException({data}, HttpStatus.OK)
     }
 

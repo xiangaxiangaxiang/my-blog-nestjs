@@ -2,13 +2,15 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { FileOperation } from 'src/utils/file-operation';
 import { myXss } from 'src/utils/xss';
-import { FindManyOptions, Like, Repository } from 'typeorm';
+import { Any, FindManyOptions, Like, Not, Repository } from 'typeorm';
 import { UpsertArticleDto } from './dto/article-upsert.dto';
-import { GetArticlesAdmin } from './dto/get-articles-admin.dto';
+import { GetArticlesAdminDto } from './dto/get-articles-admin.dto';
+import { GetLabelsDto } from './dto/get-labels.dto';
+import { GetRecommendationDto } from './dto/get-recommendation.dto';
 import { Article } from './entity/articles.entity';
 import { ArticleType, ReleaseStatus } from './entity/enum';
 import { Labels } from './entity/labels.entity';
-import { GetArticleDetail, GetArticleList, SaveImage } from './interface/articles.interface';
+import { GetArticleDetail, GetArticleList, GetLabels, SaveImage } from './interface/articles.interface';
 
 @Injectable()
 export class ArticlesService {
@@ -35,56 +37,64 @@ export class ArticlesService {
         }
     }
 
-    async getLabel() {}
+    async getLabel(getLabelsDto:GetLabelsDto):Promise<GetLabels> {
+        const labels = await this.labelRepository.find({
+            select: ['label'],
+            where: {
+                type: getLabelsDto.type
+            }
+        })
+        return {labels}
+    }
 
-    async showArticleList(getArticlesAdmin:GetArticlesAdmin): Promise<GetArticleList> {
+    async showArticleList(getArticlesAdminDto:GetArticlesAdminDto): Promise<GetArticleList> {
         const filter: FindManyOptions = {
             select: ['articleId', 'title', 'articleType', 'content', 'likeNums', 'clickNums', 'commentsNums', 'firstImage'],
             where: {
-                articleType: getArticlesAdmin.articleType,
+                articleType: getArticlesAdminDto.articleType,
                 releaseStatus: ReleaseStatus.RELEASE
             }
         }
-        if (getArticlesAdmin.label) {
+        if (getArticlesAdminDto.label) {
             filter.where = Object.assign(filter.where, {
-                labels: Like(`%${getArticlesAdmin.label}%`)
+                labels: Like(`%${getArticlesAdminDto.label}%`)
             })
         }
-        const [ articles, total ] = await this.getAticles(filter, getArticlesAdmin)
+        const [ articles, total ] = await this.getAticles(filter, getArticlesAdminDto)
         return {
             articles,
             total
         }
     }
 
-    async getArticlesByAdmin(getArticlesAdmin:GetArticlesAdmin): Promise<GetArticleList> {
+    async getArticlesByAdmin(getArticlesAdminDto:GetArticlesAdminDto): Promise<GetArticleList> {
         const filter: FindManyOptions = {}
-        if (getArticlesAdmin.label || getArticlesAdmin.searchText) {
+        if (getArticlesAdminDto.label || getArticlesAdminDto.searchText) {
             filter.where = {}
-            if (getArticlesAdmin.label) {
+            if (getArticlesAdminDto.label) {
                 filter.where = Object.assign(filter.where, {
-                    labels: Like(`%${getArticlesAdmin.label}%`)
+                    labels: Like(`%${getArticlesAdminDto.label}%`)
                 })
             }
-            if (getArticlesAdmin.searchText) {
+            if (getArticlesAdminDto.searchText) {
                 filter.where = Object.assign(filter.where, {
-                    title: Like(`%${getArticlesAdmin.searchText}%`)
+                    title: Like(`%${getArticlesAdminDto.searchText}%`)
                 })
             }
         }
-        const [ articles, total ] = await this.getAticles(filter, getArticlesAdmin)
+        const [ articles, total ] = await this.getAticles(filter, getArticlesAdminDto)
         return {
             articles,
             total
         }
     }
 
-    async getAticles(filter: FindManyOptions, getArticlesAdmin:GetArticlesAdmin) {
+    async getAticles(filter: FindManyOptions, getArticlesAdminDto:GetArticlesAdminDto) {
         filter = Object.assign({
-            skip: getArticlesAdmin.offset,
-            take: getArticlesAdmin.limit,
+            skip: getArticlesAdminDto.offset,
+            take: getArticlesAdminDto.limit,
             order: {
-                [getArticlesAdmin.sortName]: getArticlesAdmin.orderName
+                [getArticlesAdminDto.sortName]: getArticlesAdminDto.orderName
             }
         }, filter)
         return await this.articleRepository.findAndCount(filter)
@@ -137,6 +147,51 @@ export class ArticlesService {
             select: ['html', 'updatedTime', 'title']
         })
         return {article}
+    }
+
+    async getRecommendation(getRecommendationDto:GetRecommendationDto):Promise<GetArticleList> {
+        const labels = JSON.parse(getRecommendationDto.labels).map(item => {
+            return Like(`%${item}%`)
+        })
+        let articles = await this.articleRepository.find({
+            select: ['articleId', 'title'],
+            skip: 0,
+            take: 5,
+            where: {
+                releaseStatus: ReleaseStatus.RELEASE,
+                labels: Any(labels),
+                articleId: Not(getRecommendationDto.articleId)
+            }
+        })
+        if (articles.length === 0) {
+            articles = await this.articleRepository.find({
+                select: ['articleId', 'title'],
+                skip: 0,
+                take: 5,
+                where: {
+                    releaseStatus: ReleaseStatus.RELEASE,
+                    articleId: Not(getRecommendationDto.articleId)
+                }
+            })
+        }
+        return {
+            articles
+        }
+    }
+
+    async getArticleDetail(articleId:string):Promise<GetArticleDetail> {
+        const article = await this.articleRepository.findOne({
+            where: {
+                articleId
+            },
+            select: ['html', 'title', 'markdown', 'labels']
+        })
+        if (!article) {
+            throw new HttpException({message: '文章不存在'}, HttpStatus.BAD_REQUEST)
+        }
+        return {
+            article
+        }
     }
 
     async _getArticle(filter:{articleId:string}, message='文章不存在'):Promise<Article> {

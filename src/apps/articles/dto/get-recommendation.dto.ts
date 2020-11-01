@@ -1,6 +1,9 @@
 import { IsString } from "class-validator";
 
-export class ArticleIdDto {
+export class GetRecommendationDto {
+
+    @IsString()
+    labels: string
 
     @IsString()
     articleId: string
