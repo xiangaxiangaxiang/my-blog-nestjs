@@ -36,7 +36,7 @@ export class UsersService {
         await this.usersRepository.save(newUser)
     }
 
-    _getDefaultAvatar() {
+    private _getDefaultAvatar() {
         return `/img/avatar/default_${ Math.floor(Math.random() * 5) + 1 }.jpg`
     }
 
@@ -67,7 +67,7 @@ export class UsersService {
         await this.addUser(user)
     }
 
-    _validateUser(user:User, password?:string) {
+    private _validateUser(user:User, password?:string) {
         if (!user) {
             throw new HttpException({message: '用户未注册'}, HttpStatus.NOT_FOUND)
         }
@@ -82,7 +82,7 @@ export class UsersService {
         }
     }
 
-    _generateToken(user:User):string {
+    private _generateToken(user:User):string {
         const payload = {
             uid: user.uid,
             userType: user.userType,

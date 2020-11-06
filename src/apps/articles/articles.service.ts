@@ -194,7 +194,7 @@ export class ArticlesService {
         }
     }
 
-    async _getArticle(filter:{articleId:string}, message='文章不存在'):Promise<Article> {
+    private async _getArticle(filter:{articleId:string}, message='文章不存在'):Promise<Article> {
         const article = await this.articleRepository.createQueryBuilder('user').select().where(filter).getOne()
         if (!article) {
             throw new HttpException({message}, HttpStatus.BAD_REQUEST)
@@ -202,7 +202,7 @@ export class ArticlesService {
         return article
     }
 
-    _getArticleId(articleType:ArticleType):string {
+    private _getArticleId(articleType:ArticleType):string {
         const articleMap = new Map()
         articleMap.set(ArticleType.TECHNOLOGY, 'te')
         articleMap.set(ArticleType.LIFE, 'lv')
