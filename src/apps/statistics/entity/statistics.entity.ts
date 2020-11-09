@@ -21,13 +21,13 @@ export class Statistics {
     @Column({type: 'int', name: 'article_hits'})
     articleHits: number
 
-    @CreateDateColumn()
+    @CreateDateColumn({name: 'created_time'})
     createdTime: Date
 
-    @UpdateDateColumn()
+    @UpdateDateColumn({name: 'updated_time'})
     updatedTime: Date
 
-    @DeleteDateColumn()
+    @DeleteDateColumn({name: 'deleted_timer'})
     deletedTime: Date
 
 }

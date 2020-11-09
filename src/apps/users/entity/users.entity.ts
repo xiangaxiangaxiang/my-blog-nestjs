@@ -36,13 +36,13 @@ export class User {
     @Column({type: 'enum', enum: UserStatus})
     enable: number
 
-    @CreateDateColumn()
+    @CreateDateColumn({name: 'created_time'})
     createdTime: Date
 
-    @UpdateDateColumn()
+    @UpdateDateColumn({name: 'updated_time'})
     updatedTime: Date
 
-    @DeleteDateColumn()
+    @DeleteDateColumn({name: 'deleted_timer'})
     deletedTime: Date
 
 }

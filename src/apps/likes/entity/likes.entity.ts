@@ -16,13 +16,13 @@ export class Likes {
     @Column({type: 'enum', enum: LikeType})
     type: number
 
-    @CreateDateColumn()
+    @CreateDateColumn({name: 'created_time'})
     createdTime: Date
 
-    @UpdateDateColumn()
+    @UpdateDateColumn({name: 'updated_time'})
     updatedTime: Date
 
-    @DeleteDateColumn()
+    @DeleteDateColumn({name: 'deleted_timer'})
     deletedTime: Date
 
 }

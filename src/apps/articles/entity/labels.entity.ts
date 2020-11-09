@@ -13,13 +13,13 @@ export class Labels {
     @Column({type: 'varchar', length: 100})
     label: string
 
-    @CreateDateColumn()
+    @CreateDateColumn({name: 'created_time'})
     createdTime: Date
 
-    @UpdateDateColumn()
+    @UpdateDateColumn({name: 'updated_time'})
     updatedTime: Date
 
-    @DeleteDateColumn()
+    @DeleteDateColumn({name: 'deleted_timer'})
     deletedTime: Date
 
 }

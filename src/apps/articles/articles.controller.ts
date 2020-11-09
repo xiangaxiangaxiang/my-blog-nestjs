@@ -38,10 +38,7 @@ export class ArticlesController {
     @Get('list')
     async getArticleListByAdmin(@Query() getArticlesAdminDto:GetArticlesAdminDto) {
         const data = await this.artcilesService.getArticlesByAdmin(getArticlesAdminDto)
-        const res = {
-            data
-        }
-        throw new HttpException(res, HttpStatus.OK)
+        throw new HttpException({ data }, HttpStatus.OK)
     }
 
     @Get('/')

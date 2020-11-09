@@ -31,6 +31,20 @@ export class UsersService {
         return user
     }
 
+    async getUsers(uidList: string[]) {
+        const users = await this.usersRepository.find({
+            select: ['nickname', 'uid', 'avatar'],
+            where: {
+                uid: uidList
+            }
+        })
+        const map = new Map()
+        users.forEach(user => {
+            map.set(user.uid, user)
+        })
+        return map
+    }
+
     async addUser(user) {
         const newUser = this.usersRepository.create(user)
         await this.usersRepository.save(newUser)

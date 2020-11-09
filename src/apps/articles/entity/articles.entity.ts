@@ -43,13 +43,13 @@ export class Article {
     @Column({name: 'first_image', type: 'varchar', default: ''})
     firstImage: string
 
-    @CreateDateColumn()
+    @CreateDateColumn({name: 'created_time'})
     createdTime: Date
 
-    @UpdateDateColumn()
+    @UpdateDateColumn({name: 'updated_time'})
     updatedTime: Date
 
-    @DeleteDateColumn()
+    @DeleteDateColumn({name: 'deleted_timer'})
     deletedTime: Date
     
 }

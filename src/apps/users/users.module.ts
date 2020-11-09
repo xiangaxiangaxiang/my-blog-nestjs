@@ -14,6 +14,7 @@ import config from 'src/config/config';
             expiresIn: config.jwtexpiresIn
         }
     })],
+    exports: [UsersService],
     controllers: [UsersController],
     providers: [UsersService, JwtStrategy]
 })
