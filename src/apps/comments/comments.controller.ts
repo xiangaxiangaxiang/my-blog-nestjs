@@ -16,8 +16,11 @@ export class CommentsController {
     async addComments(@Request() req, addCommentDto: AddCommentDto) {
         const uid = req.user.uid
 
-        await this.commentsService.addComment(uid, addCommentDto)
-        throw new HttpException({message: '评论成功！！！'}, HttpStatus.OK)
+        const data = await this.commentsService.addComment(uid, addCommentDto)
+        throw new HttpException({
+            message: '评论成功！！！',
+            data
+        }, HttpStatus.OK)
     }
 
 }

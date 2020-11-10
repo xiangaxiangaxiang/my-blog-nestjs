@@ -8,8 +8,8 @@ import { LikesModule } from './apps/likes/likes.module';
 import { NotificationModule } from './apps/notification/notification.module';
 
 @Module({
-  imports: [TypeOrmModule.forRoot(), UsersModule, ArticlesModule, StatisticsModule, CommentsModule, LikesModule, NotificationModule],
-  controllers: [],
-  providers: [],
+    imports: [TypeOrmModule.forRoot(), UsersModule, ArticlesModule, StatisticsModule, CommentsModule, LikesModule, NotificationModule],
+    controllers: [],
+    providers: [],
 })
 export class AppModule {}

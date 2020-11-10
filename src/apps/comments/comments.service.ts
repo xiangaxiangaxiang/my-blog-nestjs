@@ -6,6 +6,7 @@ import { Comments } from './entity/comments.entity';
 import { IsDelete } from './entity/enum';
 import { myXss } from 'src/utils/xss';
 import { UsersService } from '../users/users.service';
+import { AddComment } from './interface/comments.interface';
 
 @Injectable()
 export class CommentsService {
@@ -15,7 +16,7 @@ export class CommentsService {
         private readonly usersService:UsersService
     ) {}
 
-    async addComment(uid:string, addCommentDto: AddCommentDto) {
+    async addComment(uid:string, addCommentDto: AddCommentDto):Promise<AddComment> {
 
         if (addCommentDto.replyUid) {
             const commentExists = await this._findComment({commentId: addCommentDto.commentId})
@@ -23,15 +24,14 @@ export class CommentsService {
                 throw new HttpException({message: '评论不存在或已删除'}, HttpStatus.BAD_REQUEST)
             }
         }
-        const newComment = {
+        const comment = this.commentRepository.create({
             uid,
             commentId: addCommentDto.commentId || this._generateCommentId(),
             targetId: addCommentDto.targetId,
             content: myXss(addCommentDto.content),
             replyUid: addCommentDto.replyUid || null
-        }
-        const comment = this.commentRepository.create(newComment)
-        this.commentRepository.save(newComment)
+        })
+        this.commentRepository.save(comment)
 
         const uidList = [uid]
         if (addCommentDto.replyUid) {
@@ -42,15 +42,16 @@ export class CommentsService {
         return {
             comment: {
                 uniqueId: comment.uniqueId,
-                commentId: newComment.commentId,
-                targetId: newComment.targetId,
-                content: newComment.content,
+                commentId: comment.commentId,
+                targetId: comment.targetId,
+                content: comment.content,
                 likeNums: comment.likeNums,
                 createdTime: comment.createdTime,
                 isDeleted: comment.isDeleted,
                 likeStatus: false,
                 userInfo: users.get(uid),
-                replyUserInfo: users.get(addCommentDto.replyUid) || {}
+                replyUserInfo: users.get(addCommentDto.replyUid) || {},
+                replyComments: !addCommentDto.replyUid ? [] : null
             }
         }
  
