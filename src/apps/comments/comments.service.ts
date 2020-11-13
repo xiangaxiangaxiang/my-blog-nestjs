@@ -80,7 +80,11 @@ export class CommentsService {
             .getManyAndCount()
         const comments = await this.commentRepository.find({
             select: ['commentId', 'uniqueId', 'createdTime', 'likeNums', 'uid', 'replyUid', 'content'],
-            where: commentIds
+            where: commentIds,
+            order: {
+                commentId: 'DESC',
+                createdTime: 'ASC'
+            }
         })
         const uidList = []
         comments.forEach(comment => {
