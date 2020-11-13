@@ -1,6 +1,6 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm/dist/common/typeorm.decorators';
-import { FindManyOptions, Like, Repository } from 'typeorm';
+import { FindManyOptions, In, Like, Repository } from 'typeorm';
 import {JwtService} from "@nestjs/jwt"
 import * as bcrypt from 'bcryptjs'
 
@@ -35,7 +35,7 @@ export class UsersService {
         const users = await this.usersRepository.find({
             select: ['nickname', 'uid', 'avatar'],
             where: {
-                uid: uidList
+                uid: In(uidList)
             }
         })
         const map = new Map()
