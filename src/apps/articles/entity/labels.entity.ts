@@ -19,7 +19,7 @@ export class Labels {
     @UpdateDateColumn({name: 'updated_time'})
     updatedTime: Date
 
-    @DeleteDateColumn({name: 'deleted_timer'})
+    @DeleteDateColumn({name: 'deleted_time'})
     deletedTime: Date
 
 }

@@ -6,9 +6,10 @@ import { StatisticsModule } from './apps/statistics/statistics.module';
 import { CommentsModule } from './apps/comments/comments.module';
 import { LikesModule } from './apps/likes/likes.module';
 import { NotificationModule } from './apps/notification/notification.module';
+import { PostModule } from './apps/post/post.module';
 
 @Module({
-    imports: [TypeOrmModule.forRoot(), UsersModule, ArticlesModule, StatisticsModule, CommentsModule, LikesModule, NotificationModule],
+    imports: [TypeOrmModule.forRoot(), UsersModule, ArticlesModule, StatisticsModule, CommentsModule, LikesModule, NotificationModule, PostModule],
     controllers: [],
     providers: [],
 })

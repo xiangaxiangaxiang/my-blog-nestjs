@@ -10,7 +10,7 @@ export class Likes {
     @Column({type: 'uuid'})
     uid: string
 
-    @Column({type: 'varchar', length: 100})
+    @Column({type: 'varchar', length: 100, name: 'target_id'})
     targetId: string
 
     @Column({type: 'enum', enum: LikeType})
@@ -22,7 +22,7 @@ export class Likes {
     @UpdateDateColumn({name: 'updated_time'})
     updatedTime: Date
 
-    @DeleteDateColumn({name: 'deleted_timer'})
+    @DeleteDateColumn({name: 'deleted_time'})
     deletedTime: Date
 
 }

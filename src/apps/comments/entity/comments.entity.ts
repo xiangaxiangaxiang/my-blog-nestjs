@@ -23,13 +23,13 @@ export class Comments {
     @Column({type: 'uuid'})
     uid: string
 
-    @Column({type: 'uuid', nullable: true})
+    @Column({type: 'uuid', nullable: true, name: 'reply_uid'})
     replyUid: string
 
-    @Column({type: 'enum', enum: IsDelete})
+    @Column({type: 'enum', enum: IsDelete, name: 'is_deleted'})
     isDeleted: number
 
-    @Column({type: 'int', default: 0})
+    @Column({type: 'int', default: 0, name: 'like_nums'})
     likeNums: number
 
     @CreateDateColumn({name: 'created_time'})
@@ -38,7 +38,7 @@ export class Comments {
     @UpdateDateColumn({name: 'updated_time'})
     updatedTime: Date
 
-    @DeleteDateColumn({name: 'deleted_timer'})
+    @DeleteDateColumn({name: 'deleted_time'})
     deletedTime: Date
 
 }
