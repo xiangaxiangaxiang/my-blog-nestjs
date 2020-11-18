@@ -13,7 +13,7 @@ export class StatisticsService {
 
     private async _getCurrentStatistics() {
         const date=  stampToStr(Date.now(), 'date')
-        let statistics:Statistics | Statistics[] = await this.statisticsRepository.find({
+        let statistics:Statistics | Statistics[] = await this.statisticsRepository.findOne({
             where: {
                 date
             }
@@ -30,6 +30,34 @@ export class StatisticsService {
         })
         await this.statisticsRepository.save(newStatistics)
         return newStatistics
+    }
+
+    async addWebHits() {
+        const statistics = await this._getCurrentStatistics()
+        await this.statisticsRepository.increment({
+            id: statistics.id
+        }, 'webHits', 1)
+    }
+
+    async addArticleHits() {
+        const statistics = await this._getCurrentStatistics()
+        await this.statisticsRepository.increment({
+            id: statistics.id
+        }, 'articleHits', 1)
+    }
+
+    async addLikes() {
+        const statistics = await this._getCurrentStatistics()
+        await this.statisticsRepository.increment({
+            id: statistics.id
+        }, 'likes', 1)
+    }
+
+    async addComments() {
+        const statistics = await this._getCurrentStatistics()
+        await this.statisticsRepository.increment({
+            id: statistics.id
+        }, 'comments', 1)
     }
 
 }

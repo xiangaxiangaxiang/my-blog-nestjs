@@ -1,12 +1,13 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { getManager, Repository } from 'typeorm';
 import { Article } from '../articles/entity/articles.entity';
 import { ReleaseStatus } from '../articles/entity/enum';
 import { Comments } from '../comments/entity/comments.entity';
 import { IsDelete } from '../comments/entity/enum';
 import { PostStatus } from '../post/entity/enum';
 import { Posts } from '../post/entity/post.entity';
+import { StatisticsService } from '../statistics/statistics.service';
 import { LikeDto } from './dto/like.dto';
 import { LikeType } from './entity/enum';
 import { Likes } from './entity/likes.entity'
@@ -19,6 +20,7 @@ export class LikesService {
         @InjectRepository(Posts) private readonly postsRepository: Repository<Posts>,
         @InjectRepository(Comments) private readonly commentsRepository: Repository<Comments>,
         @InjectRepository(Article) private readonly articleRepository: Repository<Article>,
+        private readonly statisticsService: StatisticsService
     ){}
 
     async getLikeStatus(uid: string, targetId:string):Promise<boolean> {
@@ -47,36 +49,41 @@ export class LikesService {
         if (like) {
             throw new HttpException({message: '你已经点赞过了'}, HttpStatus.BAD_REQUEST)
         }
+        await getManager().transaction(async transactionalEntityManager => {
+            const newLike = this.likesRepository.create({
+                uid,
+                type: likeDto.type,
+                targetId: likeDto.targetId
+            })
+            await transactionalEntityManager.save(newLike)
+            await this.changeLikeNums(likeDto.type, likeDto.targetId, 'increment')
+            await this.statisticsService.addLikes()
+
+        })
     }
 
-    private async getData(type:LikeType, targetId:string) {
-        let data
+    private async changeLikeNums(type:LikeType, targetId:string, operation: 'increment' | 'decrement') {
         if (type === LikeType.ARTICLE) {
-            data = await this.articleRepository.find({
-                where: {
-                    articleId: targetId,
-                    releaseStatus: ReleaseStatus.RELEASE
-                }
-            })
+            const func = this.articleRepository[operation]
+            await func({
+                articleId: targetId,
+                releaseStatus: ReleaseStatus.RELEASE
+            }, 'likeNums', 1)
         } else if (type === LikeType.COMMENT) {
-            data = await this.commentsRepository.find({
-                where: {
-                    uniqueId: targetId,
-                    isDeleted: IsDelete.NO
-                }
-            })
+            const func = this.commentsRepository[operation]
+            await func({
+                uniqueId: targetId,
+                isDeleted: IsDelete.NO
+            }, 'likeNums', 1)
         } else if (type === LikeType.POST) {
-            data = await this.postsRepository.find({
-                where: {
-                    postId: targetId,
-                    status: PostStatus.POST
-                }
-            })
+            const func = this.postsRepository[operation]
+            await func({
+                postId: targetId,
+                status: PostStatus.POST
+            }, 'likeNums', 1)
+        } else {
+            throw new HttpException({message: '对象不存在'}, HttpStatus.BAD_REQUEST)
         }
-        if (!data) {
-            throw new HttpException({message: '对象已被删除'}, HttpStatus.BAD_REQUEST)
-        }
-        return data
     }
 
 }
