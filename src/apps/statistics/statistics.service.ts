@@ -11,9 +11,9 @@ export class StatisticsService {
         @InjectRepository(Statistics) private readonly statisticsRepository: Repository<Statistics>,
     ) {}
 
-    private async _getCurrentStatistics() {
-        const date=  stampToStr(Date.now(), 'date')
-        let statistics:Statistics | Statistics[] = await this.statisticsRepository.findOne({
+    private async _getCurrentStatistics(time:Date=new Date()) {
+        const date=  stampToStr(time, 'date')
+        let statistics:Statistics = await this.statisticsRepository.findOne({
             where: {
                 date
             }
@@ -30,6 +30,13 @@ export class StatisticsService {
         })
         await this.statisticsRepository.save(newStatistics)
         return newStatistics
+    }
+
+    async minusLike(time:Date) {
+        const statistics = await this._getCurrentStatistics(time)
+        await this.statisticsRepository.decrement({
+            id: statistics.id
+        }, 'likes', 1)
     }
 
     async addWebHits() {

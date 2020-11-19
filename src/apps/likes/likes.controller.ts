@@ -21,4 +21,14 @@ export class LikesController {
 
     }
 
+    @Post('/cancel')
+    @UseGuards(new JwtAuthGuard(UserType.USER))
+    async dislike(@Request() req, likeDto:LikeDto) {
+        
+        const uid = req.user.uid
+        await this.likesService.dislike(uid, likeDto)
+        throw new HttpException({message:'取消点赞'}, HttpStatus.OK)
+
+    }
+
 }

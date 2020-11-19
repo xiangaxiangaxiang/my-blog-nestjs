@@ -8,6 +8,7 @@ import { Comments } from './entity/comments.entity';
 
 @Module({
     imports: [TypeOrmModule.forFeature([Comments]), UsersModule],
+    exports: [CommentsService],
     controllers: [ CommentsController],
     providers: [CommentsService, JwtAuthGuard]
 })

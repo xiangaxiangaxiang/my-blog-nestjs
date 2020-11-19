@@ -1,6 +1,6 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Like, Repository } from 'typeorm';
+import { In, Like, Repository } from 'typeorm';
 import { AddCommentDto } from './dto/add-comment.dto';
 import { Comments } from './entity/comments.entity';
 import { IsDelete } from './entity/enum';
@@ -17,6 +17,20 @@ export class CommentsService {
         @InjectRepository(Comments) private readonly commentRepository: Repository<Comments>,
         private readonly usersService:UsersService
     ) {}
+
+    async getCommentsMap(commentIds: string[]) {
+        const commments = await this.commentRepository.find({
+            select: ['content'],
+            where: {
+                uniqueId: In(commentIds)
+            }
+        })
+        const map = new Map()
+        commments.forEach(commment => {
+            map.set(commment.uniqueId, commment.content)
+        })
+        return map
+    }
 
     async addComment(uid:string, addCommentDto: AddCommentDto):Promise<AddComment> {
 

@@ -1,5 +1,5 @@
+import { TargetType } from 'src/utils/common.enum'
 import { Column, CreateDateColumn, DeleteDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm'
-import { LikeType } from './enum'
 
 @Entity()
 export class Likes {
@@ -13,7 +13,7 @@ export class Likes {
     @Column({type: 'varchar', length: 100, name: 'target_id'})
     targetId: string
 
-    @Column({type: 'enum', enum: LikeType})
+    @Column({type: 'enum', enum: TargetType})
     type: number
 
     @CreateDateColumn({name: 'created_time'})

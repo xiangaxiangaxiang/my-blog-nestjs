@@ -1,10 +1,11 @@
-export const stampToStr = function (stamp, accuracy = 'second') {
-    if (!stamp) {
+export const stampToStr = function (time:Date|number, accuracy = 'second') {
+    if (!time) {
         return '-'
     }
-    stamp = stamp.toString().padEnd(13, '000')
-    stamp = parseInt(stamp)
-    const d = new Date(stamp)
+    if (Number.isInteger(time)) {
+        time = parseInt(time.toString().padEnd(13, '000'))
+    }
+    const d = new Date(time)
     const year = d.getFullYear()
     const month = (d.getMonth() + 1).toString().padStart(2, '0')
     const date = d.getDate().toString().padStart(2, '0')

@@ -1,12 +1,12 @@
 import { IsEnum, IsString, IsUUID } from "class-validator";
-import { LikeType } from "../entity/enum";
+import { TargetType } from "src/utils/common.enum";
 
 export class LikeDto {
 
     @IsString()
     targetId: string
 
-    @IsEnum(LikeType)
+    @IsEnum(TargetType)
     type: number
 
     @IsUUID()

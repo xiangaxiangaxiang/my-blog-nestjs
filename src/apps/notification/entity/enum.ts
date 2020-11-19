@@ -1,5 +1,9 @@
 export enum NotificationType {
-    ARTICLE=100,
-    COMMENT=200,
-    POST=300
+    COMMENT=100,
+    LIKE=200
+}
+
+export enum ReadStatus {
+    UNREAD,
+    HAVE_READ=1
 }

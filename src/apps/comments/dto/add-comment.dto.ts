@@ -1,5 +1,5 @@
 import { IsEnum, IsOptional, Length } from "class-validator";
-import { NotificationType } from "src/apps/notification/entity/enum";
+import { TargetType } from "src/utils/common.enum";
 
 export class AddCommentDto {
 
@@ -9,7 +9,7 @@ export class AddCommentDto {
     @Length(1, 500)
     content: string
 
-    @IsEnum(NotificationType)
+    @IsEnum(TargetType)
     type: number
 
     @IsOptional()
