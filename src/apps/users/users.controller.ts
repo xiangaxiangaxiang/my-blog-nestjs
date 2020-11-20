@@ -1,4 +1,4 @@
-import { Body, Controller, Get, HttpException, HttpStatus, Param, ParseIntPipe, Post, Query, Request, Response, UploadedFile, UseGuards, UseInterceptors, UsePipes } from '@nestjs/common';
+import { Body, Controller, Get, HttpException, HttpStatus, Post, Query, Request, Response, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express/multer/interceptors/file.interceptor';
 import { JwtAuthGuard } from 'src/guard/Jwt-auth-guard.guard';
 import { PaginationDto } from 'src/utils/pagination.dto';

@@ -67,4 +67,11 @@ export class StatisticsService {
         }, 'comments', 1)
     }
 
+    getMonthlyStatistics() {
+        throw new Error('Method not implemented.');
+    }
+    getTotal() {
+        throw new Error('Method not implemented.');
+    }
+
 }

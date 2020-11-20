@@ -42,7 +42,7 @@ export class User {
     @UpdateDateColumn({name: 'updated_time'})
     updatedTime: Date
 
-    @DeleteDateColumn({name: 'deleted_timer'})
+    @DeleteDateColumn({name: 'deleted_timer', select: false})
     deletedTime: Date
 
 }
