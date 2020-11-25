@@ -18,6 +18,7 @@ export class TasksService {
             date: stampToStr(Date.now(), 'date')
         })
         await this.statisticsRepository.save(newStatistics)
+        console.log(666)
     }
 
 }
