@@ -18,7 +18,7 @@ export class StatisticsController {
     }
 
     @Get('get_monthly_statistics')
-    @UseGuards(new JwtAuthGuard(UserType.ADMIN))
+    // @UseGuards(new JwtAuthGuard(UserType.ADMIN))
     async getMonthlyStatistics() {
         const data = await this.statisticsService.getMonthlyStatistics()
         throw new HttpException({data}, HttpStatus.OK)

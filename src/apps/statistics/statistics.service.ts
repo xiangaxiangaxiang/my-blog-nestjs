@@ -67,11 +67,26 @@ export class StatisticsService {
         }, 'comments', 1)
     }
 
-    getMonthlyStatistics() {
-        throw new Error('Method not implemented.');
+    async getMonthlyStatistics() {
+        const data = await this.statisticsRepository.find({
+            select: ['articleHits', 'comments', 'likes', 'webHits', 'date'],
+            take: 30,
+            order: {
+                date: 'DESC'
+            }
+        })
+        return data
     }
-    getTotal() {
-        throw new Error('Method not implemented.');
+
+    async getTotal() {
+        const data = await this.statisticsRepository
+            .createQueryBuilder('statistics')
+            .select('SUM(statistics.web_hits)', 'webHits')
+            .addSelect('SUM(statistics.comments)', 'comments')
+            .addSelect('SUM(statistics.likes)', 'likes')
+            .addSelect('SUM(statistics.article_hits)', 'articleHits')
+            .getRawOne()
+        return data
     }
 
 }

@@ -23,7 +23,7 @@ export class Posts {
     @Column({type: 'int', default: 0, name: 'like_nums'})
     likeNums: number
 
-    @Column({type: 'enum', enum: PostStatus, name: 'like_nums'})
+    @Column({type: 'enum', enum: PostStatus})
     status: number
 
     @CreateDateColumn({name: 'created_time'})
