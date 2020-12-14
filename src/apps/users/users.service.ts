@@ -180,8 +180,7 @@ export class UsersService {
         if (!user) {
             throw new HttpException({message:'用户不存在'}, HttpStatus.BAD_REQUEST)
         }
-        user.enable = UserStatus.DISABLE
-        this.usersRepository.save(user)
+        this.usersRepository.update({enable: UserStatus.DISABLE}, user)
     }
 
     async unblockUser(userIdDto:UserIdDto) {
@@ -189,8 +188,7 @@ export class UsersService {
         if (!user) {
             throw new HttpException({message:'用户不存在'}, HttpStatus.BAD_REQUEST)
         }
-        user.enable = UserStatus.ENABLE
-        this.usersRepository.save(user)
+        this.usersRepository.update({enable: UserStatus.ENABLE}, user)
     }
 
 }
